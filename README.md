@@ -1,2 +1,2 @@
 # poe-1-vex
-Repo for vex lesson code sam ands fares
+Repository for vex lesson code. Used by Sam Thakker and Fares Alkhier.
