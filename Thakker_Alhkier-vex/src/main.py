@@ -67,14 +67,15 @@ def testIntertial():
 
     brain.screen.clear_screen()
     while(bumpSwitch.pressing() == False):
+        wait(10, MSEC) #dbounce 10 ms
         brain.screen.set_cursor(5,1)
         brain.screen.print("Heading: ", str(inertial_1.heading()))
         brain.screen.set_cursor(6,1)
         brain.screen.print("Rotation: ", str(inertial_1.rotation()))
         brain.screen.set_cursor(8,1)
         brain.screen.print("Press the bump switch to exit")
-        if (bumpSwitch.pressing() == True):
-            break
+        #if (bumpSwitch.pressing() == True):
+            #break
         
         brain.screen.clear_row(8)
         brain.screen.set_cursor(8,1)
