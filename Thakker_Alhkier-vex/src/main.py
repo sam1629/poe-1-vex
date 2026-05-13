@@ -72,17 +72,19 @@ def testIntertial():
         brain.screen.print("Heading: ", str(inertial_1.heading()))
         brain.screen.set_cursor(6,1)
         brain.screen.print("Rotation: ", str(inertial_1.rotation()))
+
         brain.screen.set_cursor(8,1)
-        brain.screen.print("Press the bump switch to exit")        
+        brain.screen.print("Press the bump switch to exit")  
+
         brain.screen.clear_row(8)
         brain.screen.set_cursor(8,1)
-        brain.screen.print("Intertial test terminated")
+        brain.screen.print("Inertial test terminated")
 
-    def main():
-        bump() #call bump to execute the program
-        inertialCalibration() #calibrate the inertial sensor
-        testIntertial() #test the inertials output
+def main():
+    bump() #call bump to execute the program
+    inertialCalibration() #calibrate the inertial sensor
+    testIntertial() #test the inertials output
     
-    main()
+main()
 
  
