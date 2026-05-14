@@ -8,7 +8,7 @@
 # ---------------------------------------------------------------------------- #
 
 # Library imports
-from token import PERCENT
+
 
 from vex import *
 
