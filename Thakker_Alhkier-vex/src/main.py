@@ -8,8 +8,6 @@
 # ---------------------------------------------------------------------------- #
 
 # Library imports
-
-
 from vex import *
 
 # Brain should be defined by default
@@ -102,6 +100,12 @@ def stopMotors():
     leftMotor.stop()
     wait(0.5, SECONDS)
 
+def pause():
+    """
+    Pause for 4 seconds
+    """
+    wait(4, SECONDS)
+
 def driveStraight(distance, setpoint, motorVelocity):
     """
     1. distance = distance to trave in inches
@@ -110,7 +114,7 @@ def driveStraight(distance, setpoint, motorVelocity):
     """
 
     inertial_1.reset_rotation() #Reset the rotation before each driving straight test
-    kP = 0.00 # proportional constant for driving straight
+    kP = 0.28 # proportional constant for driving straight
                 #used to calculate the correction to maintain course
                 #if too small, correction will occur too slowly
                 # if too large, correction will occur
@@ -144,7 +148,7 @@ def driveStraight(distance, setpoint, motorVelocity):
 
             driveStraightData(error) #Display position, rotation, and error
     #stop the motors when the desired distance is reached
-            stopMotors()
+        stopMotors()
     else:
 
         distance *= -1 # distance= distance * -1
@@ -164,14 +168,55 @@ def driveStraight(distance, setpoint, motorVelocity):
 
             driveStraightData(error) #Display position, rotation, and error
     #stop the motors when the desired distance is reached
-            stopMotors()
+        stopMotors()
+
+def driveBackwards(distance, setpoint, motorVelocity):
+    """
+    1. distance = distance to travel backwards in inches
+    2. setpoint = 0-degrees
+    3. motorVelocity = the velocity of the motors (positive value)
+    """
+
+    inertial_1.reset_rotation() #Reset the rotation before each driving straight test
+    kP = 0.14 # proportional constant for driving straight in reverse
+                #used to calculate the correction to maintain course
+                #a smaller value helps reduce overshoot while reversing
+    wheelDiameter = 4 #Diameter of the wheels in inches
+
+    #calculate the distance in terms of encoder tickets ( 1 tick = 1 degree)
+    #distance (ticks) = (distance (inches) / (pi * wheel diameter)) * 360
+    wheelCircumference = wheelDiameter * math.pi        #wheel circumference
+    distance = (distance / wheelCircumference) * 360 #distance in terms of encoder ticks
+    
+    leftMotor.set_position(0, DEGREES) #Reset the left motor's position to 0 degrees
+    rightMotor.set_position(0, DEGREES) #Reset the right motor's position to 0 degrees
+
+    #Drive backwards
+    #while loop to track the distance traveled
+    while(leftMotor.position() > -distance):
+        error = (setpoint - inertial_1.rotation()) #Calculate error
+        correction = kP * error #motor velocity correction
+
+        #correct motor velocities for reverse direction
+        leftMotor.set_velocity(motorVelocity - correction, PERCENT)
+        rightMotor.set_velocity(motorVelocity + correction, PERCENT)
+
+        leftMotor.spin(REVERSE)
+        rightMotor.spin(REVERSE)
+
+        driveStraightData(error) #Display position, rotation, and error
+        wait(10, MSEC)
+    #stop the motors when the desired distance is reached
+    stopMotors()
 
 
 def main():
     bump() #call bump to execute the program
     inertialCalibration() #calibrate the inertial sensor
     
-    driveStraight(90, 0, 50) #call driveStraight with distance, setpoint, and motor velocity
+    driveStraight(86, 0, 50) #call driveStraight with distance, setpoint, and motor velocity
+    pause()
+    driveBackwards(86, 0, 50) #call driveBackwards with distance, setpoint, and motor velocity
     
 main()
 
