@@ -114,6 +114,10 @@ def driveStraight(distance, setpoint, motorVelocity):
     """
 
     inertial_1.reset_rotation() #Reset the rotation before each driving straight test
+#set stopping mode for the motors
+    leftMotor.set_stopping(COAST)
+    rightMotor.set_stopping(COAST)
+
     kP = 0.28 # proportional constant for driving straight
                 #used to calculate the correction to maintain course
                 #if too small, correction will occur too slowly
@@ -169,6 +173,88 @@ def driveStraight(distance, setpoint, motorVelocity):
             driveStraightData(error) #Display position, rotation, and error
     #stop the motors when the desired distance is reached
         stopMotors()
+
+def turnData(turnError, derivative):
+    """
+    Print the current heading, turning error, and derivative values
+    """
+    brain.screen.set_cursor(1,1)
+    brain.screen.print("Postiion: " + str(inertial_1.heading())) # Return the current motor count
+
+    brain.screen.set_cursor(2,1)
+    brain.screen.print("Rotation: " + str(abs(turnError))) #Return the current turning error 
+
+    brain.screen.set_cursor(3,1)
+    brain.screen.print("Error: " + str(abs(derivative))) # Return the current derivative
+
+def pointTurn(setPoint):
+    """
+    1. Perform a point turn using the inertial sensor and proportional and derivative control
+    2. Argument: Desired heading (setPoint)
+    """
+    brain.screen.clear_screen() #Clear the brain's screen
+
+    leftMotor.set_stopping(BRAKE)
+    rightMotor.set_stopping(BRAKE)
+
+    difference = setPoint - inertial_1.heading()
+
+    #want to minimize the amount of turn required 
+
+    if(setPoint > inertial_1.heading()):
+        if(abs(difference) > 180):
+            clockwise = True
+        else:
+            clockwise = False
+    else:
+        if(abs(difference) > 180):
+            clockwise = False
+        else:
+            clockwise = True
+    
+    #Define kP and kD values for the CW and CCW turns
+    if (clockwise):
+        kP = 0.04   #Values if clockwise
+        kD = 0.00
+    else:           #Values if counterclockwise
+        kP = 0.04
+        kD = 0.00
+    
+    # Define maximum velocity and previous error terms
+    maxVelocity = 50    #Units %
+    previousError = 0.0 #Error from the previous iteration of the control loop
+
+    
+    while(True):
+
+        turnError = setPoint - inertial_1.heading()
+        derivative = turnError - previousError
+
+        #Stop motors and exit the control loop when the error and
+        #derivative are sufficiently small to ensure the
+        #set point was reached without oscillation
+        if ((abs(turnError) < 1) and (abs(derivative) < 0.2)):
+            stopMotors()    #Stop the motors
+            break           #Leave the loop
+        
+        # Proportional and Derivative correction calculations
+        turnCorrection = (kP * turnError) + (kD * derivative)
+
+        # Limit the corrective term to make sure we don't exceed the maximum velocity
+        if(abs(turnCorrection) > 1):
+            turnCorrection = 1
+        
+        turnVelocity = turnCorrection * maxVelocity
+
+        
+        if(clockwise):
+            leftMotor.set_velocity(turnVelocity)
+            rightMotor.set_velocity(turnVelocity)
+        else:
+            leftMotor.set_velocity(-turnVelocity)
+            rightMotor.set_velocity(-turnVelocity)
+            
+
 
 def driveBackwards(distance, setpoint, motorVelocity):
     """
