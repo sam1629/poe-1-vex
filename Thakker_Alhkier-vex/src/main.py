@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------- #
 #                                                                              #
 #   Module:       main.py                                                      #
-#   Author:       Anish Batra and Ethan Yip                                                   #
+#   Author:       Sam Thakker and Fares Alhkier                                #
 #   Created:      5/5/2026, 9:42:24 AM                                         #
 #   Description:  V5 project                                                   #
 #                                                                              #
@@ -271,7 +271,18 @@ def pointTurn(setPoint):
         previousError = turnError # Update the previous error for the next iteration
         
         wait(20, MSEC) # Wait 20 ms
-        
+def liftArm(motorVelocity, liftAngle):
+    liftMotor.set_stopping(HOLD) # Configure the motor to hold its position
+
+    liftMotor.set_velocity(motorVelocity, PERCENT) # Set lift arm motor
+
+    gearRatio = 5
+    motorAngularDisplacement = liftAngle * gearRatio #calcualte motor axle's angular displacement
+
+    liftMotor.spin_for(FORWARD, motorAngularDisplacement, DEGREES) # Spin the motor for the given angular displacment in degrees
+    wait(0.5, SECONDS) 
+
+
 def main():
     """
     The main() function is the program that will be executed by the brain
