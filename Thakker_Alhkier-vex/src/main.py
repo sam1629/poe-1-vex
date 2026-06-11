@@ -16,7 +16,7 @@ from vex import *
 brain = Brain()
 
 # -------------------------------------------- Robot Configuration --------------------------------------------
-rightMotor = Motor(Ports.PORT7, GearSetting.RATIO_18_1, False)  # Right drivetrain motor
+rightMotor = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)  # Right drivetrain motor
 leftMotor = Motor(Ports.PORT2, GearSetting.RATIO_18_1, True)  # Left drivetrain motor
 # Set the leftMotor reverse property to True so that when driving forward it turns in the
 # same direction as the right motor.
@@ -225,11 +225,11 @@ def pointTurn(setPoint):
     
     # Define the kP and kD constants for the CW and CCW turnus
     if(clockwise):      
-        kP = 0.04       # Values if clockwise
-        kD = 0.00
+        kP = 0.12       # Values if clockwise
+        kD = 0.10
     else:               
-        kP = 0.04       # Values if counterclocwise
-        kD = 0.00
+        kP = 0.12      # Values if counterclocwise
+        kD = 0.10
     
     # Define maximum velocity and previous error terms
     maxVelocity = 50          # Units : %
@@ -271,18 +271,7 @@ def pointTurn(setPoint):
         previousError = turnError # Update the previous error for the next iteration
         
         wait(20, MSEC) # Wait 20 ms
-def liftArm(motorVelocity, liftAngle):
-    liftMotor.set_stopping(HOLD) # Configure the motor to hold its position
-
-    liftMotor.set_velocity(motorVelocity, PERCENT) # Set lift arm motor
-
-    gearRatio = 5
-    motorAngularDisplacement = liftAngle * gearRatio #calcualte motor axle's angular displacement
-
-    liftMotor.spin_for(FORWARD, motorAngularDisplacement, DEGREES) # Spin the motor for the given angular displacment in degrees
-    wait(0.5, SECONDS) 
-
-
+        
 def main():
     """
     The main() function is the program that will be executed by the brain
@@ -296,13 +285,12 @@ def main():
     driveStraight(83.8, 0, -50) # Call driveStaight() with distance, setpoint, and motor velocity parameters to drive in reverse
     """
     
-    
     pointTurn(224)
-    """
+    
     wait(2, SECONDS)
-    pointTurn(27)
+    pointTurn(37)
     wait(2, SECONDS)
     pointTurn(135)
-    """
+    stopMotors()
 
 main()
